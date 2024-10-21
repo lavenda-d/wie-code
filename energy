@@ -1,0 +1,66 @@
+#include <LiquidCrystal.h>
+
+// Initialize the LCD with the pins used for the parallel LCD
+LiquidCrystal lcd(12, 10, 5, 4, 3, 2);
+
+// Define pin connections
+const int potPin = A0;
+const int greenLED = 11;
+const int orangeLED = 9;
+const int redLED = 8;
+const int buzzer = 13;
+
+void setup() {
+  // Initialize the LCD and specify dimensions
+  lcd.begin(16, 2);
+  lcd.setCursor(0, 0);
+  lcd.print("Energy Monitor ");
+  lcd.setCursor(0, 1);
+  lcd.print("Loading...");
+  delay(3000);
+
+  // Set LED and buzzer pins as output
+  pinMode(greenLED, OUTPUT);
+  pinMode(orangeLED, OUTPUT);
+  pinMode(redLED, OUTPUT);
+  pinMode(buzzer, OUTPUT);
+}
+
+void loop() {
+  // Read potentiometer value (0 to 1023)
+  int potValue = analogRead(potPin);
+
+  // Convert potentiometer value to percentage
+  int energyLevel = map(potValue, 0, 1023, 0, 100);
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Power usage:");
+
+  if (energyLevel < 40) {
+    lcd.setCursor(0, 1);
+    lcd.print("Low");
+    digitalWrite(greenLED, HIGH);
+    digitalWrite(orangeLED, LOW);
+    digitalWrite(redLED, LOW);
+    noTone(buzzer); // No buzzer for low level
+  } 
+  else if (energyLevel < 70) {
+    lcd.setCursor(0, 1);
+    lcd.print("Normal");
+    digitalWrite(greenLED, LOW);
+    digitalWrite(orangeLED, HIGH);
+    digitalWrite(redLED, LOW);
+    noTone(buzzer); // No buzzer for medium level
+  } 
+  else {
+    lcd.setCursor(0, 1);
+    lcd.print("High");
+    digitalWrite(greenLED, LOW);
+    digitalWrite(orangeLED, LOW);
+    digitalWrite(redLED, HIGH);
+    tone(buzzer, 1000); // Buzzer sounds for high level
+  }
+
+  delay(2000); // Small delay to avoid flickering
+}
